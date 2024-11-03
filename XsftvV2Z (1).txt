@@ -1,0 +1,733 @@
+
+task.spawn(function()
+wait(1.3)
+local player = game.Players.LocalPlayer
+local playerCharacter = player.Character or player.CharacterAdded:Wait()
+local mesh = game.ReplicatedStorage.Resources.StoicBomb.GAG.End.Mesh
+
+if mesh then
+    local part = Instance.new("Part")
+    part.Size = Vector3.new(0.1, 0.3, 0.3)
+    part.Anchored = true
+    part.CanCollide = false
+    part.Transparency = 1
+    part.Parent = game.Workspace
+    
+    local meshClone = mesh:Clone()
+    meshClone.Parent = part
+    meshClone.Scale = Vector3.new(1, 1, 1)
+    local decal = Instance.new("Decal")
+    decal.Texture = "rbxassetid://9330320034"
+    decal.Face = Enum.NormalId.Front
+    decal.Transparency = 0.8
+    decal.Parent = part
+    local humanoidRootPart = playerCharacter:WaitForChild("HumanoidRootPart")
+    local offset = Vector3.new(0, 16, 0)
+    part.CFrame = CFrame.new(humanoidRootPart.Position + offset)
+    part.Rotation = Vector3.new(0.1, 0, 90)
+wait(0.3)
+part:Destroy()
+end
+end)
+
+task.spawn(function()
+wait(1.3)
+local TweenService = game:GetService("TweenService")
+local colorCorrection = Instance.new("ColorCorrectionEffect")
+colorCorrection.Parent = game.Lighting
+colorCorrection.Brightness = 0
+colorCorrection.Contrast = 0
+colorCorrection.Saturation = 0
+local targetProperties = {
+    Brightness = -0.998,
+    Contrast = 3.991,
+    Saturation = -0.299
+}
+
+local tweenInfo = TweenInfo.new(
+    0.3,
+    Enum.EasingStyle.Sine,
+    Enum.EasingDirection.Out
+)
+
+local tween = TweenService:Create(colorCorrection, tweenInfo, targetProperties)
+tween:Play()
+
+local vfx = game.ReplicatedStorage.Resources.StoicBomb["stoic bomb boom entrance"].smok:Clone()
+vfx.Parent = game.Players.LocalPlayer.Character.HumanoidRootPart
+for _, e in ipairs(vfx:GetChildren()) do
+if e:IsA("ParticleEmitter") then
+e:Emit(100)
+end
+end
+
+local vfx = game.ReplicatedStorage.Resources.StoicBomb["stoic bomb boom entrance"]["BOMB.TWO."]:Clone()
+vfx.Parent = game.Players.LocalPlayer.Character.HumanoidRootPart
+vfx:Emit(10)
+end)
+
+task.spawn(function()
+wait(1.3)
+local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
+
+local mainModel = game.ReplicatedStorage.Resources.StoicBomb.WindTime:Clone()
+local invertedModel = mainModel:FindFirstChild("Inverted")
+local windModel = mainModel:FindFirstChild("WindTimeGlass")
+mainModel.Parent = workspace.Thrown
+
+local character = game.Players.LocalPlayer.Character
+local humanoidRootPart = character and character:FindFirstChild("HumanoidRootPart")
+
+local targetScale = Vector3.new(250, 250, 250)
+local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Linear, Enum.EasingDirection.Out, 0, false, 0)
+
+local function tweenModel(model)
+    local totalTweens = 0
+    local completedTweens = 0
+
+    if not model then
+        print("Error: Model is nil.")
+        return
+    end
+
+    for _, part in pairs(model:GetDescendants()) do
+        if part:IsA("BasePart") then
+            totalTweens += 1
+            local tween = TweenService:Create(part, tweenInfo, {Size = targetScale})
+
+            tween.Completed:Connect(function()
+                completedTweens += 1
+                if completedTweens == totalTweens then
+                    mainModel:Destroy()
+                end
+            end)
+
+            tween:Play()
+        end
+    end
+
+    if totalTweens == 0 then
+        mainModel:Destroy()
+    end
+end
+
+local function setModelCFrameToHumanoidRootPart(model, humanoidRootPart)
+    if not model.PrimaryPart then
+        print("Error: The model does not have a PrimaryPart set.")
+        return
+    end
+
+    if humanoidRootPart then
+        model:SetPrimaryPartCFrame(humanoidRootPart.CFrame)
+    else
+        print("Error: HumanoidRootPart not found.")
+    end
+end
+
+local rotationSpeed = 3
+
+local function rotateModel(model)
+    if not model.PrimaryPart then
+        print("Error: The model does not have a PrimaryPart set.")
+        return
+    end
+
+    RunService.RenderStepped:Connect(function(deltaTime)
+        model:SetPrimaryPartCFrame(model.PrimaryPart.CFrame * CFrame.Angles(0, rotationSpeed * deltaTime, 0))
+    end)
+end
+
+if humanoidRootPart then
+    setModelCFrameToHumanoidRootPart(mainModel, humanoidRootPart)
+    rotateModel(mainModel) -- Start spinning the mainModel
+
+    if invertedModel then
+        tweenModel(invertedModel)
+    else
+        print("Error: Inverted model not found.")
+    end
+
+    if windModel then
+        tweenModel(windModel)
+    else
+        print("Error: Wind model not found.")
+    end
+else
+    print("Error: HumanoidRootPart not found.")
+end
+wait(1.4)
+mainModel:Destroy()
+end)
+
+task.spawn(function()
+wait(1.3)
+local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService") -- Add RunService to handle spinning
+local mainModel = game.ReplicatedStorage.Resources.StoicBomb.InWind:Clone()
+local invertedModel = mainModel:FindFirstChild("Inverted")
+local windModel = mainModel:FindFirstChild("WindTime")
+mainModel.Parent = workspace.Thrown
+
+-- Get the character and HumanoidRootPart
+local character = game.Players.LocalPlayer.Character
+local humanoidRootPart = character and character:FindFirstChild("HumanoidRootPart")
+
+-- Define the target scale for tweening
+local targetScale = Vector3.new(250, 250, 250)
+
+-- Tween information with slower time
+local tweenInfo = TweenInfo.new(
+    0.3, -- Time (in seconds) - increased for slower resizing
+    Enum.EasingStyle.Linear, -- EasingStyle
+    Enum.EasingDirection.Out, -- EasingDirection
+    0, -- RepeatCount (0 = no repeat)
+    false, -- Reverses (false = no reverse)
+    0 -- DelayTime
+)
+
+-- Function to apply tween to a model
+local function tweenModel(model)
+    local totalTweens = 0
+    local completedTweens = 0
+
+    if not model then
+        print("Error: Model is nil.")
+        return
+    end
+
+    for _, part in pairs(model:GetDescendants()) do
+        if part:IsA("BasePart") then
+            totalTweens += 1
+            local tween = TweenService:Create(part, tweenInfo, {Size = targetScale})
+
+            print("Creating tween for part:", part.Name)
+
+            tween.Completed:Connect(function()
+                print("Tween completed for part:", part.Name)
+                completedTweens += 1
+                if completedTweens == totalTweens then
+                    print("All tweens completed for model:", model.Name)
+                    mainModel:Destroy()
+                end
+            end)
+
+            tween:Play()
+            print("Playing tween for part:", part.Name)
+        else
+            print("Skipping non-BasePart:", part.Name)
+        end
+    end
+
+    if totalTweens == 0 then
+        print("No BaseParts found in model:", model.Name)
+        mainModel:Destroy()
+    end
+end
+
+-- Function to set mainModel's CFrame to match a HumanoidRootPart
+local function setModelCFrameToHumanoidRootPart(model, humanoidRootPart)
+    if not model.PrimaryPart then
+        print("Error: The model does not have a PrimaryPart set.")
+        return
+    end
+
+    if humanoidRootPart then
+        model:SetPrimaryPartCFrame(humanoidRootPart.CFrame)
+        print("Model CFrame set to HumanoidRootPart CFrame.")
+    else
+        print("Error: HumanoidRootPart not found.")
+    end
+end
+
+-- Function to rotate the model
+local rotationSpeed = 3 -- Speed of rotation in radians per second
+local function rotateModel(model)
+    if not model.PrimaryPart then
+        print("Error: The model does not have a PrimaryPart set.")
+        return
+    end
+
+    RunService.RenderStepped:Connect(function(deltaTime)
+        model:SetPrimaryPartCFrame(model.PrimaryPart.CFrame * CFrame.Angles(0, rotationSpeed * deltaTime, 0))
+    end)
+end
+
+-- Check if the HumanoidRootPart exists
+if humanoidRootPart then
+    -- Set the CFrame of the mainModel
+    setModelCFrameToHumanoidRootPart(mainModel, humanoidRootPart)
+
+    -- Start rotating the model
+    rotateModel(mainModel)
+
+    -- Tween both models
+    if invertedModel then
+        tweenModel(invertedModel)
+    else
+        print("Error: Inverted model not found.")
+    end
+
+    if windModel then
+        tweenModel(windModel)
+    else
+        print("Error: Wind model not found.")
+    end
+else
+    print("Error: HumanoidRootPart not found.")
+end
+
+wait(1.4)
+mainModel:Destroy()
+end)
+
+spawn(function()
+            local SoundTP = Instance.new("Sound", game.Players.LocalPlayer.Character.Torso)
+            SoundTP.SoundId = "rbxassetid://17149593018"
+            SoundTP.Playing = true 
+            wait(0.5)
+            local OtherSFX = Instance.new("Sound", game.Players.LocalPlayer.Character.Torso)
+            OtherSFX.SoundId = "rbxassetid://17141392513"
+            OtherSFX.Playing = true 
+            wait(0.3)
+            local IMMACHARGEMYLASER = Instance.new("Sound", game.Players.LocalPlayer.Character.Torso)
+            IMMACHARGEMYLASER.SoundId = "rbxassetid://17141392976"
+            IMMACHARGEMYLASER.Playing = true
+            wait(1)
+            local haisenbakudan = Instance.new("Sound", game.Players.LocalPlayer.Character.Torso)
+            haisenbakudan.SoundId = "rbxassetid://17141392676"
+            haisenbakudan.Playing = true
+            wait(1.5)
+            local BOOM = Instance.new("Sound", game.Players.LocalPlayer.Character.Torso)
+            BOOM.SoundId = "rbxassetid://17141392854"
+            BOOM.Playing = true
+            end)
+            game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 0
+            local player = game.Players.LocalPlayer
+            repeat wait() until player.Character.Humanoid
+            local humanoid = player.Character.Humanoid
+            local character = player.Character or player.CharacterAdded:Wait()
+            local UserInputService = game:GetService("UserInputService")
+            
+            local anim = Instance.new("Animation")
+            anim.AnimationId = "rbxassetid://17141153099"
+            
+            local playAnim = humanoid:LoadAnimation(anim)
+            anim.AnimationId = "rbxassetid://0"
+            playAnim:Play()
+            playAnim:AdjustSpeed(1)
+            wait(0.3)
+            playAnim:AdjustSpeed(1)
+            spawn(function()
+            wait(1)
+            local omgstoicreal = game.ReplicatedStorage.Resources.StoicBomb.OHNO.Normal:Clone()
+            local parent = omgstoicreal
+local omgstoicreal = game.ReplicatedStorage.Resources.StoicBomb.OHNO.Normal:Clone()
+            local parent = omgstoicreal
+local omgstoicreal = game.ReplicatedStorage.Resources.StoicBomb.OHNO.Normal:Clone()
+            local parent = omgstoicreal
+local omgstoicreal = game.ReplicatedStorage.Resources.StoicBomb.OHNO.Normal:Clone()
+            local parent = omgstoicreal
+        local attachments = {}
+        
+        for _, child in ipairs(parent:GetChildren()) do
+            if child:IsA("Attachment") and child.Name == "Attachment" then
+                table.insert(attachments, child)
+            end
+        end
+        
+        local newParent = game.Players.LocalPlayer.Character:FindFirstChild("Torso")
+        
+        if newParent then
+            for _, attachment in ipairs(attachments) do
+                -- Attachment'Ã„Â±n konumunu ayarlayÃ„Â±n (ÃƒÂ¶rneÃ„Å¸in, aÃ…Å¸aÃ„Å¸Ã„Â±da 2 birim)
+                attachment.Parent = newParent
+                attachment.Position = attachment.Position + Vector3.new(0, -4, 0) -- Y ekseninde -2 birim aÃ…Å¸aÃ„Å¸Ã„Â±
+                game.Players.LocalPlayer.Character.Torso.Attachment:Destroy()
+            end
+        end
+            end)
+            
+            spawn(function()
+            local speedlinesamazingomg = game.ReplicatedStorage.Resources.KJEffects.stoicbombspeedlines.speedylines:Clone()
+            local speedlinesamazingomg2 = game.ReplicatedStorage.Resources.KJEffects.stoicbombspeedlines.speedylinesfire:Clone()
+            speedlinesamazingomg.Parent = game.ReplicatedStorage.Resources.KJEffects.stoicbombspeedlines.Attachment
+            speedlinesamazingomg2.Parent = game.ReplicatedStorage.Resources.KJEffects.stoicbombspeedlines.Attachment
+            local hmattachmentsus = game.ReplicatedStorage.Resources.KJEffects.stoicbombspeedlines.Attachment:Clone()
+            hmattachmentsus.Parent = game.Players.LocalPlayer.Character.Torso
+            game.Players.LocalPlayer.Character.Torso.Attachment["STAR!!!"].Enabled = true
+            game.Players.LocalPlayer.Character.Torso.Attachment.speedylines.Enabled = true
+            game.Players.LocalPlayer.Character.Torso.Attachment.speedylinesfire.Enabled = true
+local speedlinesamazingomg = game.ReplicatedStorage.Resources.KJEffects.stoicbombspeedlines.speedylines:Clone()
+            local speedlinesamazingomg2 = game.ReplicatedStorage.Resources.KJEffects.stoicbombspeedlines.speedylinesfire:Clone()
+            speedlinesamazingomg.Parent = game.ReplicatedStorage.Resources.KJEffects.stoicbombspeedlines.Attachment
+            speedlinesamazingomg2.Parent = game.ReplicatedStorage.Resources.KJEffects.stoicbombspeedlines.Attachment
+            local hmattachmentsus = game.ReplicatedStorage.Resources.KJEffects.stoicbombspeedlines.Attachment:Clone()
+            hmattachmentsus.Parent = game.Players.LocalPlayer.Character.Torso
+            game.Players.LocalPlayer.Character.Torso.Attachment["STAR!!!"].Enabled = true
+            game.Players.LocalPlayer.Character.Torso.Attachment.speedylines.Enabled = true
+            game.Players.LocalPlayer.Character.Torso.Attachment.speedylinesfire.Enabled = true
+local speedlinesamazingomg = game.ReplicatedStorage.Resources.KJEffects.stoicbombspeedlines.speedylines:Clone()
+            local speedlinesamazingomg2 = game.ReplicatedStorage.Resources.KJEffects.stoicbombspeedlines.speedylinesfire:Clone()
+            speedlinesamazingomg.Parent = game.ReplicatedStorage.Resources.KJEffects.stoicbombspeedlines.Attachment
+            speedlinesamazingomg2.Parent = game.ReplicatedStorage.Resources.KJEffects.stoicbombspeedlines.Attachment
+            local hmattachmentsus = game.ReplicatedStorage.Resources.KJEffects.stoicbombspeedlines.Attachment:Clone()
+            hmattachmentsus.Parent = game.Players.LocalPlayer.Character.Torso
+            game.Players.LocalPlayer.Character.Torso.Attachment["STAR!!!"].Enabled = true
+            game.Players.LocalPlayer.Character.Torso.Attachment.speedylines.Enabled = true
+            game.Players.LocalPlayer.Character.Torso.Attachment.speedylinesfire.Enabled = true
+local speedlinesamazingomg = game.ReplicatedStorage.Resources.KJEffects.stoicbombspeedlines.speedylines:Clone()
+            local speedlinesamazingomg2 = game.ReplicatedStorage.Resources.KJEffects.stoicbombspeedlines.speedylinesfire:Clone()
+            speedlinesamazingomg.Parent = game.ReplicatedStorage.Resources.KJEffects.stoicbombspeedlines.Attachment
+            speedlinesamazingomg2.Parent = game.ReplicatedStorage.Resources.KJEffects.stoicbombspeedlines.Attachment
+            local hmattachmentsus = game.ReplicatedStorage.Resources.KJEffects.stoicbombspeedlines.Attachment:Clone()
+            hmattachmentsus.Parent = game.Players.LocalPlayer.Character.Torso
+            game.Players.LocalPlayer.Character.Torso.Attachment["STAR!!!"].Enabled = true
+            game.Players.LocalPlayer.Character.Torso.Attachment.speedylines.Enabled = true
+            game.Players.LocalPlayer.Character.Torso.Attachment.speedylinesfire.Enabled = true
+local speedlinesamazingomg = game.ReplicatedStorage.Resources.KJEffects.stoicbombspeedlines.speedylines:Clone()
+            local speedlinesamazingomg2 = game.ReplicatedStorage.Resources.KJEffects.stoicbombspeedlines.speedylinesfire:Clone()
+            speedlinesamazingomg.Parent = game.ReplicatedStorage.Resources.KJEffects.stoicbombspeedlines.Attachment
+            speedlinesamazingomg2.Parent = game.ReplicatedStorage.Resources.KJEffects.stoicbombspeedlines.Attachment
+            local hmattachmentsus = game.ReplicatedStorage.Resources.KJEffects.stoicbombspeedlines.Attachment:Clone()
+            hmattachmentsus.Parent = game.Players.LocalPlayer.Character.Torso
+            game.Players.LocalPlayer.Character.Torso.Attachment["STAR!!!"].Enabled = true
+            game.Players.LocalPlayer.Character.Torso.Attachment.speedylines.Enabled = true
+            game.Players.LocalPlayer.Character.Torso.Attachment.speedylinesfire.Enabled = true
+local speedlinesamazingomg = game.ReplicatedStorage.Resources.KJEffects.stoicbombspeedlines.speedylines:Clone()
+            local speedlinesamazingomg2 = game.ReplicatedStorage.Resources.KJEffects.stoicbombspeedlines.speedylinesfire:Clone()
+            speedlinesamazingomg.Parent = game.ReplicatedStorage.Resources.KJEffects.stoicbombspeedlines.Attachment
+            speedlinesamazingomg2.Parent = game.ReplicatedStorage.Resources.KJEffects.stoicbombspeedlines.Attachment
+            local hmattachmentsus = game.ReplicatedStorage.Resources.KJEffects.stoicbombspeedlines.Attachment:Clone()
+            hmattachmentsus.Parent = game.Players.LocalPlayer.Character.Torso
+            game.Players.LocalPlayer.Character.Torso.Attachment["STAR!!!"].Enabled = true
+            game.Players.LocalPlayer.Character.Torso.Attachment.speedylines.Enabled = true
+            game.Players.LocalPlayer.Character.Torso.Attachment.speedylinesfire.Enabled = true
+            end)
+local light1 = game.ReplicatedStorage.Resources.StoicBomb["stoicbombspeedlines"].POINTOLIGHTO:Clone()
+            light1.Parent = game.Players.LocalPlayer.Character["Torso"]
+                for _, child in ipairs(light1:GetChildren()) do
+                    if child:IsA("ParticleEmitter") then -- Check if the child is a ParticleEmitter
+                        child:Emit(1) -- Emit 20 particles
+                    end
+                end
+
+task.spawn(function()
+wait(2.6)
+local lighting = game:GetService("Lighting")
+local tweenService = game:GetService("TweenService")
+lighting.ExposureCompensation = 0
+local tweenInfo = TweenInfo.new(
+    0.7,
+    Enum.EasingStyle.Quad,
+    Enum.EasingDirection.Out
+)
+
+local goal = {ExposureCompensation = 10}
+
+local tween = tweenService:Create(lighting, tweenInfo, goal)
+tween:Play()
+
+tween.Completed:Connect(function()
+    local resetTweenInfo = TweenInfo.new(
+        0,
+        Enum.EasingStyle.Quad,
+        Enum.EasingDirection.InOut
+    )
+    
+    local resetGoal = {ExposureCompensation = 0}
+    local resetTween = tweenService:Create(lighting, resetTweenInfo, resetGoal)
+    resetTween:Play()
+end)
+end)
+
+
+local function adjustAndEmitParticles(part, emitAmount)
+    part.Parent = game.Players.LocalPlayer.Character["HumanoidRootPart"]
+    for _, child in ipairs(part:GetChildren()) do
+        if child:IsA("ParticleEmitter") then
+            child.Size = NumberSequence.new({
+                NumberSequenceKeypoint.new(0, 10),
+                NumberSequenceKeypoint.new(1, 20)
+            })
+            child:Emit(emitAmount)
+        end
+    end
+end
+
+local red4_7 = game.ReplicatedStorage.Resources.StoicBomb["OHNO"].Normal.Attachment:Clone()
+adjustAndEmitParticles(red4_7, 1)
+
+            wait(0.1)
+local red4_1 = game.ReplicatedStorage.Resources.StoicBomb["HEAT"].Part.Attachment:Clone()
+red4_1.Parent = game.Players.LocalPlayer.Character["HumanoidRootPart"]
+for _, child in ipairs(red4_1:GetChildren()) do
+    if child:IsA("ParticleEmitter") then
+        child.Size = NumberSequence.new({
+            NumberSequenceKeypoint.new(0, 10),
+            NumberSequenceKeypoint.new(1, 20)
+        })
+        child:Emit(1)
+    end
+end
+
+local function adjustAndEmitParticles(part)
+    part.Parent = game.Players.LocalPlayer.Character["HumanoidRootPart"]
+    for _, child in ipairs(part:GetChildren()) do
+        if child:IsA("ParticleEmitter") then
+            child.Size = NumberSequence.new({
+                NumberSequenceKeypoint.new(0, 10),
+                NumberSequenceKeypoint.new(1, 20)
+            })
+            child:Emit(1)
+        end
+    end
+end
+
+local red4_2 = game.ReplicatedStorage.Resources.StoicBomb["Stage1"].Floor.Attachment:Clone()
+adjustAndEmitParticles(red4_2)
+
+local red4_3 = game.ReplicatedStorage.Resources.StoicBomb["Stage1"].Inverted.MeshPart:Clone()
+adjustAndEmitParticles(red4_3)
+
+local red4_4 = game.ReplicatedStorage.Resources.StoicBomb["SPREAD"].Part.On:Clone()
+adjustAndEmitParticles(red4_4)
+            wait(1.4)
+local boom1 = game.ReplicatedStorage.Resources.KJEffects["stoic bomb boom entrance"].Attachment:Clone()
+boom1.Parent = game.Players.LocalPlayer.Character["Torso"]
+boom1.CFrame = boom1.CFrame * CFrame.new(0, -4, 0)
+for _, child in ipairs(boom1:GetChildren()) do
+    if child:IsA("ParticleEmitter") then
+        child:Emit(3)
+    end
+end
+            wait(1.6)
+            local stoic1 = game.ReplicatedStorage.Resources.StoicBomb["pre"].Part.Attachment:Clone()
+            stoic1.Parent = game.Players.LocalPlayer.Character["Torso"]
+                for _, child in ipairs(stoic1:GetChildren()) do
+                    if child:IsA("ParticleEmitter") then -- Check if the child is a ParticleEmitter
+                        child:Emit(1) -- Emit 20 particles
+                    end
+                    end
+local red4 = game.ReplicatedStorage.Resources.StoicBomb["Impact"].Part.Impact:Clone()
+red4.Parent = game.Players.LocalPlayer.Character["Left Leg"]
+    for _, child in ipairs(red4:GetChildren()) do
+        if child:IsA("ParticleEmitter") then -- Check if the child is a ParticleEmitter
+            child:Emit(1) -- Emit 20 particles
+        end
+        end
+                local red4 = game.ReplicatedStorage.Resources.StoicBomb["Impact"].Part.Spin:Clone()
+red4.Parent = game.Players.LocalPlayer.Character["Left Leg"]
+    for _, child in ipairs(red4:GetChildren()) do
+        if child:IsA("ParticleEmitter") then -- Check if the child is a ParticleEmitter
+            child:Emit(1) -- Emit 20 particles
+        end
+        end
+                local red4 = game.ReplicatedStorage.Resources.StoicBomb["Impact"].Part.Attachment:Clone()
+red4.Parent = game.Players.LocalPlayer.Character["Left Leg"]
+    for _, child in ipairs(red4:GetChildren()) do
+        if child:IsA("ParticleEmitter") then -- Check if the child is a ParticleEmitter
+            child:Emit(1) -- Emit 20 particles
+        end
+        end
+            wait(0.1)
+            local stoic2 = game.ReplicatedStorage.Resources.StoicBomb["Main"].Part.Attachment:Clone()
+            stoic2.Parent = game.Players.LocalPlayer.Character["Torso"]
+                for _, child in ipairs(stoic2:GetChildren()) do
+                    if child:IsA("ParticleEmitter") then -- Check if the child is a ParticleEmitter
+                        child:Emit(1) -- Emit 20 particles
+                    end
+                    end
+        
+                    local replicatedStorage = game:GetService("ReplicatedStorage")
+        local character = game.Players.LocalPlayer.Character or game.Players.LocalPlayer.CharacterAdded:Wait()
+        local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+            light1:Destroy()
+            stoic1:Destroy()
+            stoic2:Destroy()
+            red4_1:Destroy()
+            red4_2:Destroy()
+            red4_3:Destroy()
+            red4_4:Destroy()
+            red4_7:Destroy()
+            local boom2 = game.ReplicatedStorage.Resources.KJEffects["stoic bomb boom entrance"].THEACTUALBOOM:Clone()
+            boom2.Parent = game.Players.LocalPlayer.Character["Torso"]
+                for _, child in ipairs(boom2:GetChildren()) do
+                    if child:IsA("ParticleEmitter") then -- Check if the child is a ParticleEmitter
+                        child:Emit(5) -- Emit 20 particles
+                    end
+                end
+local stoic1 = game.ReplicatedStorage.Resources.StoicBomb["pre"].Part.Attachment:Clone()
+stoic1.Parent = game.Players.LocalPlayer.Character["Torso"]
+stoic1.CFrame = stoic1.CFrame * CFrame.new(0, -1, 0)
+
+for _, child in ipairs(stoic1:GetChildren()) do
+    if child:IsA("ParticleEmitter") then
+        child:Emit(1)
+    end
+end
+game.Lighting:FindFirstChildOfClass("ColorCorrectionEffect"):Destroy()
+
+            local boom3 = game.ReplicatedStorage.Resources.KJEffects["stoic bomb boom entrance"].smok:Clone()
+            boom3.Parent = game.Players.LocalPlayer.Character["Torso"]
+                for _, child in ipairs(boom3:GetChildren()) do
+                    if child:IsA("ParticleEmitter") then -- Check if the child is a ParticleEmitter
+                        child:Emit(5) -- Emit 20 particles
+                    end
+                end
+local red4_5 = game.ReplicatedStorage.Resources.StoicBomb["SPREAD"].Part.WW:Clone()
+red4_5.Parent = game.Players.LocalPlayer.Character["HumanoidRootPart"]
+for _, child in ipairs(red4_5:GetChildren()) do
+    if child:IsA("ParticleEmitter") then
+        child:Emit(1)
+    end
+end
+
+local red4_6 = game.ReplicatedStorage.Resources.StoicBomb["SPREAD"].Part.On.FF:Clone()
+red4_6.Parent = game.Players.LocalPlayer.Character["HumanoidRootPart"]
+for _, child in ipairs(red4_6:GetChildren()) do
+    if child:IsA("ParticleEmitter") then
+        child:Emit(1)
+    end
+end
+local boom2 = game.ReplicatedStorage.Resources.KJEffects["stoic bomb boom entrance"].THEACTUALBOOM:Clone()
+            boom2.Parent = game.Players.LocalPlayer.Character["Torso"]
+                for _, child in ipairs(boom2:GetChildren()) do
+                    if child:IsA("ParticleEmitter") then -- Check if the child is a ParticleEmitter
+                        child:Emit(5) -- Emit 20 particles
+                    end
+                end
+            local boom3 = game.ReplicatedStorage.Resources.KJEffects["stoic bomb boom entrance"].smok:Clone()
+            boom3.Parent = game.Players.LocalPlayer.Character["Torso"]
+                for _, child in ipairs(boom3:GetChildren()) do
+                    if child:IsA("ParticleEmitter") then -- Check if the child is a ParticleEmitter
+                        child:Emit(5) -- Emit 20 particles
+                    end
+                end
+
+task.spawn(function()
+local RunService = game:GetService("RunService")
+local Player = game.Players.LocalPlayer
+local Camera = game.Workspace.CurrentCamera
+
+local shakeDuration = 1
+local shakeMagnitude = 9
+local shakeFrequency = 2
+
+function ScreenShake(duration, magnitude)
+    local startTime = tick()
+    local connection
+
+    connection = RunService.RenderStepped:Connect(function()
+        local elapsedTime = tick() - startTime
+        if elapsedTime >= duration then
+            connection:Disconnect()
+            return
+        end
+        
+        local shakeOffset = Vector3.new(
+            math.random(-magnitude, magnitude) / shakeFrequency,
+            math.random(-magnitude, magnitude) / shakeFrequency,
+            math.random(-magnitude, magnitude) / shakeFrequency
+        )
+        
+        Camera.CFrame = Camera.CFrame * CFrame.new(shakeOffset)
+    end)
+end
+ScreenShake(shakeDuration, shakeMagnitude)
+end)
+
+task.spawn(function()
+local r = game:GetService("ReplicatedStorage")
+local w = game.Workspace
+local t = game:GetService("TweenService")
+local a = r:FindFirstChild("Resources")
+local d
+
+if a then
+    local b = a:FindFirstChild("StoicBomb")
+    if b then
+        local c = b:FindFirstChild("Stage1")
+        if c then
+            d = c:Clone()
+            local e = w:FindFirstChild("Thrown")
+            if e and game.Players.LocalPlayer.Character then
+                local f = game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+                if f then
+                    d.Parent = e
+                    d:SetPrimaryPartCFrame(f.CFrame * CFrame.new(0, 18, 0))
+
+                    local function g(m)
+                        for _, h in ipairs(m:GetChildren()) do
+                            if h:IsA("Model") then
+                                g(h)
+                            elseif h:IsA("BasePart") or h:IsA("MeshPart") then
+                                local s = TweenInfo.new(0.24, Enum.EasingStyle.Sine, Enum.EasingDirection.Out)
+                                t:Create(h, s, {Size = h.Size * 8}):Play()
+                            end
+                            if h:IsA("BasePart") then
+                                for _, i in ipairs(h:GetChildren()) do
+                                    if i:IsA("SpecialMesh") then
+                                        local sm = TweenInfo.new(0.24, Enum.EasingStyle.Sine, Enum.EasingDirection.Out)
+                                        t:Create(i, sm, {Scale = i.Scale * 8}):Play()
+                                    end
+                                end
+                            end
+                        end
+                    end
+
+                    g(d)
+                end
+            end
+        end
+    end
+end
+
+task.delay(0.29, function()
+    if d then
+        d:Destroy()
+    end
+end)
+end)
+
+local boom2 = game.ReplicatedStorage.Resources.KJEffects["stoic bomb boom entrance"].THEACTUALBOOM:Clone()
+            boom2.Parent = game.Players.LocalPlayer.Character["Torso"]
+                for _, child in ipairs(boom2:GetChildren()) do
+                    if child:IsA("ParticleEmitter") then -- Check if the child is a ParticleEmitter
+                        child:Emit(5) -- Emit 20 particles
+                    end
+                end
+            local boom3 = game.ReplicatedStorage.Resources.KJEffects["stoic bomb boom entrance"].smok:Clone()
+            boom3.Parent = game.Players.LocalPlayer.Character["Torso"]
+                for _, child in ipairs(boom3:GetChildren()) do
+                    if child:IsA("ParticleEmitter") then -- Check if the child is a ParticleEmitter
+                        child:Emit(5) -- Emit 20 particles
+                    end
+                end
+local red4 = game.ReplicatedStorage.Resources.StoicBomb["Ray"].Ray.Attachment:Clone()
+red4.Parent = game.Players.LocalPlayer.Character["Left Leg"]
+    for _, child in ipairs(red4:GetChildren()) do
+        if child:IsA("ParticleEmitter") then -- Check if the child is a ParticleEmitter
+            child:Emit(1) -- Emit 20 particles
+        end
+        end
+                
+                wait(0.3)
+                local parent = script.Parent
+                local attachmentName = "Attachment"  -- Silmek istediÃ„Å¸iniz attachment'Ã„Â±n adÃ„Â±
+                
+                -- Torso iÃƒÂ§indeki attachment'larÃ„Â± bul
+                local torso = game.Players.LocalPlayer.Character:FindFirstChild("Torso")
+                
+                if torso then
+                    for _, child in ipairs(torso:GetChildren()) do
+                        if child:IsA("Attachment") and child.Name == attachmentName then
+                            child:Destroy()  -- Attachment'Ã„Â± sil
+                        end
+                    end
+                end
+                
+        attachments:Destroy()
+        wait(0.3)
+            game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 16
+
