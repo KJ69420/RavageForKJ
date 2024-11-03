@@ -7,32 +7,7 @@
 
 
 
-                spawn(function()
-                    local o = tick()
-                    local p = l.Size
-
-                    while tick() - o < b do
-                        local q = tick() - o
-                        local r = q / b
-
-                        local s = UDim2.new(
-                            p.X.Scale,
-                            p.X.Offset,
-                            p.Y.Scale * (1 - r),
-                            p.Y.Offset * (1 - r)
-                        )
-
-                        l.Size = s
-                        wait()
-                    end
-
-                    l.Size = n
-                    l:Destroy()
-                end)
-            end
-        end
-    end
-end
+                
     
 local p = game.Players.LocalPlayer
 local c = p.Character or p.CharacterAdded:Wait()
