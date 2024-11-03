@@ -4,38 +4,8 @@
 
 
     
-if not c then
-        return
-    end
-    
-    c = false
 
-    delay(d, function()
-        c = true
-    end)
-    
-local b = 28
-local c = game.Players.LocalPlayer
-local d = c:WaitForChild("PlayerGui")
-local e = d:WaitForChild("Hotbar")
-local f = e:WaitForChild("Backpack")
-local g = f:WaitForChild("Hotbar")
 
-for n = 1, 13 do
-    local h = g:FindFirstChild(tostring(n))
-    if h then
-        local i = h:FindFirstChild("Base")
-        if i then
-            local j = i:FindFirstChild("ToolName")
-            if j and j.Text == "Ravage" then
-                local k = f:WaitForChild("LocalScript"):WaitForChild("Cooldown")
-                local l = k:Clone()
-
-                l.Parent = h
-                l.BackgroundColor3 = Color3.fromRGB(255, 78, 78)
-
-                local m = l.Size
-                local n = UDim2.new(m.X.Scale, m.X.Offset, 0, 0)
 
                 spawn(function()
                     local o = tick()
